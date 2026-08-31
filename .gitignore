@@ -16,3 +16,5 @@ coverage/
 .DS_Store
 # TypeScript incremental build info
 *.tsbuildinfo
+
+docs/
