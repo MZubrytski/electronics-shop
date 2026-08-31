@@ -1,0 +1,33 @@
+{
+  "name": "electronics-shop",
+  "version": "0.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "concurrently -n contracts,api,web -c gray,green,cyan \"npm:dev:contracts\" \"npm:dev:api\" \"npm:dev:web\"",
+    "dev:contracts": "npm run dev -w @shop/contracts",
+    "dev:api": "npm run start:dev -w @shop/api",
+    "dev:web": "npm run dev -w @shop/web",
+    "build": "npm run build -w @shop/contracts && npm run build -w @shop/api && npm run build -w @shop/web",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "db:migrate": "npm run prisma:migrate -w @shop/api",
+    "db:seed": "npm run prisma:seed -w @shop/api",
+    "db:studio": "npm run prisma:studio -w @shop/api",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.5",
+    "prettier": "^3.9.6"
+  }
+}
