@@ -4,3 +4,9 @@ dist
 .nuxt
 coverage
 packages/contracts/dist
+
+**/generated
+**/.agents
+**/.claude
+**/.windsurf
+skills-lock.json
