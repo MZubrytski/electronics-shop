@@ -102,6 +102,13 @@ Vitest, не Jest. `globals: true`, поэтому `describe`/`it`/`expect` им
 | `src/**/*.spec.ts`   | модульные                | `vitest.config.ts`     |
 | `test/*.e2e-spec.ts` | сквозные через Supertest | `vitest.config.e2e.ts` |
 
+Сквозные тесты ходят в **отдельную базу** `DATABASE_URL_TEST`, а не в рабочую:
+они чистят таблицы между тестами. `npm run test:e2e` сам создаёт базу
+и накатывает миграции, так что на новой машине ничего делать руками не нужно.
+
+Хелперы в `test/helpers/`: `createTestApp`, `resetState` (пустые таблицы +
+сброшенный лимит частоты), регистрация и выдача токенов.
+
 Что обязательно покрыто тестами (PRD §10):
 
 - вход и обновление токена;
@@ -169,6 +176,17 @@ UPDATE "Product" SET stock = stock - $qty WHERE id = $id AND stock >= $qty
 PRD §7 описывает **сущности предметной области**, а не колонки: имена таблиц
 и полей туда не переносятся. Схема живёт в плане фичи, которая её вводит.
 
+### Переменные окружения
+
+| Переменная           | Зачем                                             | Нужна на проде |
+| -------------------- | ------------------------------------------------- | -------------- |
+| `DATABASE_URL`       | рабочая база                                      | да             |
+| `DATABASE_URL_TEST`  | база для сквозных тестов, её чистят между тестами | нет            |
+| `JWT_ACCESS_SECRET`  | подпись access-токена                             | да             |
+| `JWT_REFRESH_SECRET` | ключ HMAC для хеша refresh-токена                 | да             |
+| `WEB_ORIGIN`         | источник для CORS                                 | да             |
+| `PORT`               | порт; на Render задаётся платформой               | нет            |
+
 `.env.example` — единственный способ узнать, какие переменные нужны проекту:
 сам `.env` в git не попадает. Добавил переменную в `.env`, не добавив в
 `.env.example`, — сломал сборку всем остальным, включая себя на новой машине.
@@ -177,15 +195,18 @@ PRD §7 описывает **сущности предметной област�
 
 ```
 src/
-  main.ts                  bootstrap, CORS, порт
+  main.ts                  bootstrap, CORS, trust proxy, порт
   app.module.ts            корневой модуль, подключает остальные
-  app.controller.ts        заглушка GET / с «Hello World!», уйдёт в F1
-  app.service.ts           то же
+  common/                  ZodValidationPipe, декоратор @CurrentUser
+  prisma/                  PrismaModule (глобальный) + PrismaService
+  users/                   поиск пользователя, toSessionUser
+  auth/                    контроллер, сервисы, guard'ы
   health/                  GET /health для пробы Render
-    health.module.ts
-    health.controller.ts
   generated/prisma/        клиент Prisma, в .gitignore
 ```
+
+`toSessionUser` — единственное место, где строка базы превращается в ответ API.
+Отдавать модель Prisma напрямую нельзя: в ней `passwordHash`.
 
 Правило: **модуль на фичу**, папка на модуль, имя папки совпадает с именем
 модуля. Пополняется вместе с этапами из [PLAN.md](../../docs/PLAN.md).

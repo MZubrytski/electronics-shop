@@ -27,8 +27,7 @@ jobs:
     env:
       DATABASE_URL: postgresql://shop:shop@localhost:5432/shop?schema=public
       DATABASE_URL_TEST: postgresql://shop:shop@localhost:5432/shop_test?schema=public
-      # Throwaway values: the end-to-end suite only needs them to be present
-      # and stable within a run.
+      # Throwaway values: the suite only needs them to be present and stable.
       JWT_ACCESS_SECRET: ci-access-secret-not-used-anywhere-else
       JWT_REFRESH_SECRET: ci-refresh-secret-not-used-anywhere-else
 
