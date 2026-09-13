@@ -215,6 +215,28 @@ describe('Auth (e2e)', () => {
         .expect(401);
     });
 
+    it('spends a token once even when two requests arrive together', async () => {
+      // A thief racing the owner: both present the same token at the same
+      // moment. Reading the row and then updating it by id is not enough —
+      // at Read Committed both reads see revokedAt = null and both rotate,
+      // which means the replay goes completely unnoticed.
+      const { tokens } = await signUp(ctx);
+
+      const results = await Promise.all([
+        ctx
+          .http()
+          .post('/auth/refresh')
+          .send({ refreshToken: tokens.refreshToken }),
+        ctx
+          .http()
+          .post('/auth/refresh')
+          .send({ refreshToken: tokens.refreshToken }),
+      ]);
+
+      const accepted = results.filter((r) => r.status === 200);
+      expect(accepted).toHaveLength(1);
+    });
+
     it('leaves other sign-ins alone when one family is compromised', async () => {
       const email = uniqueEmail();
       const first = await signUp(ctx, { email });
@@ -243,6 +265,31 @@ describe('Auth (e2e)', () => {
         .post('/auth/refresh')
         .send({ refreshToken: second.refreshToken })
         .expect(200);
+    });
+
+    it('hands out one token when the same one is refreshed twice at once', async () => {
+      // Two requests with one token: exactly one may win.
+      //
+      // Honest limitation: this does not force the interleaving where both
+      // transactions read before either writes — in practice the second one
+      // sees the first already committed. The conditional revoke in
+      // AuthService guards that window; proving it would need two
+      // transactions held open against a barrier, which HTTP cannot express.
+      const { tokens } = await signUp(ctx);
+
+      const results = await Promise.all([
+        ctx
+          .http()
+          .post('/auth/refresh')
+          .send({ refreshToken: tokens.refreshToken }),
+        ctx
+          .http()
+          .post('/auth/refresh')
+          .send({ refreshToken: tokens.refreshToken }),
+      ]);
+
+      const statuses = results.map((r) => r.status).sort();
+      expect(statuses).toEqual([200, 401]);
     });
 
     it('stops refreshing once the family hits its ceiling', async () => {
@@ -304,6 +351,28 @@ describe('Auth (e2e)', () => {
   });
 
   describe('rate limiting', () => {
+    it('cannot be dodged by changing the case of the path', async () => {
+      // Express matches routes case-insensitively and tolerates a trailing
+      // slash, so a budget keyed by the requested path hands out a fresh ten
+      // attempts for every spelling.
+      const email = uniqueEmail();
+      await signUp(ctx, { email });
+
+      for (let attempt = 0; attempt < 10; attempt += 1) {
+        await ctx
+          .http()
+          .post('/auth/sign-in')
+          .send({ email, password: 'wrong-password' })
+          .expect(401);
+      }
+
+      await ctx
+        .http()
+        .post('/AUTH/SIGN-IN')
+        .send({ email, password: 'wrong-password' })
+        .expect(429);
+    });
+
     it('cuts off after ten attempts a minute from one address', async () => {
       const email = uniqueEmail();
       await signUp(ctx, { email });

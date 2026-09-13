@@ -10,6 +10,15 @@ import { UsersService, toSessionUser } from '../users/users.service.js';
 import { PasswordService } from './password.service.js';
 import { REFRESH_TOKEN_TTL_MS, TokensService } from './tokens.service.js';
 
+function isUniqueViolation(error: unknown): boolean {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    (error as { code?: string }).code === 'P2002'
+  );
+}
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -20,29 +29,38 @@ export class AuthService {
   ) {}
 
   async signUp(input: SignUpInput): Promise<AuthResult> {
-    const existing = await this.users.findByEmail(input.email);
+    const passwordHash = await this.passwords.hash(input.password);
 
-    if (existing) {
-      throw new ConflictException('This email is already registered');
+    try {
+      const user = await this.users.create({
+        email: input.email,
+        name: input.name,
+        passwordHash,
+      });
+
+      return await this.startSession(user.id, toSessionUser(user));
+    } catch (error) {
+      // Let the unique index decide instead of checking first: a check
+      // followed by a create loses the race between two simultaneous
+      // sign-ups and turns the loser into a 500.
+      if (isUniqueViolation(error)) {
+        throw new ConflictException('This email is already registered');
+      }
+      throw error;
     }
-
-    const user = await this.users.create({
-      email: input.email,
-      name: input.name,
-      passwordHash: await this.passwords.hash(input.password),
-    });
-
-    return this.startSession(user.id, toSessionUser(user));
   }
 
   async signIn(input: SignInInput): Promise<AuthResult> {
     const user = await this.users.findByEmail(input.email);
 
-    // Same answer for an unknown address and a wrong password: telling them
-    // apart would turn sign-in into a way to enumerate customers.
-    const ok =
-      user !== null &&
-      (await this.passwords.verify(user.passwordHash, input.password));
+    // Same answer for an unknown address and a wrong password — and the same
+    // amount of work. Skipping the hash when the address is unknown would
+    // answer in a millisecond instead of ~50, and the difference alone tells
+    // an attacker who is registered.
+    const ok = await this.passwords.verify(
+      user?.passwordHash ?? this.passwords.dummyHash,
+      input.password,
+    );
 
     if (!user || !ok) {
       throw new UnauthorizedException('Invalid email or password');
@@ -78,10 +96,24 @@ export class AuthService {
       const now = new Date();
       if (stored.expiresAt <= now || stored.familyExpiresAt <= now) return null;
 
-      await tx.refreshToken.update({
-        where: { id: stored.id },
+      // Conditional update, not a plain one: under READ COMMITTED two
+      // concurrent refreshes both read revokedAt = null, and an unconditional
+      // update would hand out two live tokens for the same family — exactly
+      // the replay the check above is supposed to catch.
+      const spent = await tx.refreshToken.updateMany({
+        where: { id: stored.id, revokedAt: null },
         data: { revokedAt: now },
       });
+
+      if (spent.count === 0) {
+        // Someone else spent it between our read and our write: same meaning
+        // as a replay.
+        await tx.refreshToken.updateMany({
+          where: { familyId: stored.familyId, revokedAt: null },
+          data: { revokedAt: now },
+        });
+        return null;
+      }
 
       const token = this.tokens.generateRefreshToken();
 

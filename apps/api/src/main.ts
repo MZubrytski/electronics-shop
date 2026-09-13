@@ -8,7 +8,13 @@ async function bootstrap() {
   // Behind the hosting proxy every request would otherwise look like it came
   // from the proxy's address, and the rate limit on /auth/* would lock out all
   // users at once instead of one abuser.
-  app.set('trust proxy', 1);
+  //
+  // Only where a proxy actually sits in front: trusting the header when the
+  // app is reachable directly lets anyone spoof X-Forwarded-For and get a
+  // fresh rate-limit bucket per request.
+  if (process.env.TRUST_PROXY === '1') {
+    app.set('trust proxy', 1);
+  }
 
   app.enableCors({
     origin: process.env.WEB_ORIGIN ?? 'http://localhost:3000',

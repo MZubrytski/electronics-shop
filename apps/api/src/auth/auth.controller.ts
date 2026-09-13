@@ -47,6 +47,7 @@ export class AuthController {
 
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
+  @UseGuards(RateLimitGuard)
   refresh(
     @Body(new ZodValidationPipe(RefreshInput)) input: RefreshInput,
   ): Promise<AuthResult> {
@@ -55,6 +56,7 @@ export class AuthController {
 
   @Post('sign-out')
   @HttpCode(HttpStatus.OK)
+  @UseGuards(RateLimitGuard)
   async signOut(
     @Body(new ZodValidationPipe(RefreshInput)) input: RefreshInput,
   ): Promise<{ ok: true }> {

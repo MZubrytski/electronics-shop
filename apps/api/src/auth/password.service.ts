@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
+import { randomBytes } from 'node:crypto';
 import { hash, verify } from '@node-rs/argon2';
 
 /**
@@ -19,7 +20,25 @@ const OPTIONS = {
 } as const;
 
 @Injectable()
-export class PasswordService {
+export class PasswordService implements OnModuleInit {
+  /**
+   * A real digest of a value nobody knows.
+   *
+   * Sign-in verifies against this when the address is unknown, so an unknown
+   * address costs the same as a real one. It has to be a genuine argon2
+   * digest: a made-up string would fail to parse in microseconds and leak the
+   * very difference it exists to hide.
+   */
+  private dummy = '';
+
+  async onModuleInit(): Promise<void> {
+    this.dummy = await this.hash(randomBytes(32).toString('hex'));
+  }
+
+  get dummyHash(): string {
+    return this.dummy;
+  }
+
   hash(plain: string): Promise<string> {
     return hash(plain, OPTIONS);
   }

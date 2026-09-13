@@ -204,9 +204,11 @@ npm run dev            # contracts (watch) + api :3001 + web :3000 разом
 npm run build          # contracts → api → web, именно в этом порядке
 npm run lint           # oxlint по воркспейсам
 npm run test           # vitest по воркспейсам
+npm run test:e2e       # сквозные тесты API; сам поднимет тестовую базу
 npm run format         # prettier по всему репозиторию
 
 npm run db:migrate     # prisma migrate dev
+npm run db:test:setup  # создать базу для сквозных тестов и накатить миграции
 npm run db:seed
 npm run db:studio
 ```

@@ -46,10 +46,15 @@ export class RateLimitGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
 
-    // request.ip is only the real client once `trust proxy` is set in main.ts.
-    // Without it every request behind the hosting proxy shares one address and
-    // the limit locks out everybody at once.
-    const key = `${request.method}:${request.path}:${request.ip ?? 'unknown'}`;
+    // Keyed by the handler, never by the requested path. Express matches
+    // routes case-insensitively and tolerates a trailing slash, so a budget
+    // keyed by `request.path` would hand out a fresh ten attempts for every
+    // spelling of the same endpoint — thousands of tries a minute.
+    const route = `${context.getClass().name}.${context.getHandler().name}`;
+
+    // request.ip is the real client only where `trust proxy` is enabled and a
+    // proxy actually sits in front. See the note in main.ts.
+    const key = `${route}:${this.clientAddress(request)}`;
 
     if (!(await this.limits.consume(key))) {
       throw new HttpException(
@@ -59,5 +64,24 @@ export class RateLimitGuard implements CanActivate {
     }
 
     return true;
+  }
+
+  /**
+   * The storefront forwards the visitor's address, because in production the
+   * browser never reaches this API directly: every sign-in arrives from the
+   * storefront's own egress address, and keying on that would put the whole
+   * shop on a single ten-attempt budget.
+   *
+   * Trusted only when the caller proved it is the storefront.
+   */
+  private clientAddress(request: Request): string {
+    const forwarded = request.header('x-client-address');
+    const secret = process.env.INTERNAL_REQUEST_SECRET;
+
+    if (forwarded && secret && request.header('x-internal-secret') === secret) {
+      return forwarded;
+    }
+
+    return request.ip ?? 'unknown';
   }
 }

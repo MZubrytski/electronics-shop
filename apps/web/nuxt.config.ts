@@ -8,6 +8,9 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     apiUrl: '',
+    // Proves to the API that a request really came from this app, so it can
+    // trust the visitor's address we forward with it.
+    internalRequestSecret: '',
     public: {
       siteUrl: '',
     },

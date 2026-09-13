@@ -7,6 +7,8 @@ export default defineVitestConfig({
     // tests. It is slower than a bare happy-dom run because it boots Nuxt —
     // worth it while the tests actually render components.
     environment: 'nuxt',
-    include: ['app/**/*.spec.ts'],
+    // server/ too: the cookie attributes that keep the session out of
+    // browser JavaScript live there, and they are worth a test.
+    include: ['{app,server}/**/*.spec.ts'],
   },
 })

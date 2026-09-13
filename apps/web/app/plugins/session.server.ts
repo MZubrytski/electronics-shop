@@ -1,16 +1,15 @@
+import type { SessionUser } from '@shop/contracts'
+
 /**
  * Fills the session on the server, before the first byte of HTML.
  *
- * Without this the page would render as a guest and then flip once the browser
- * caught up — the flash of a signed-out header that cookies were chosen to
- * avoid in the first place.
+ * Reads what the session middleware already resolved for this request rather
+ * than fetching again: an internal fetch would make a second request whose
+ * response — and whose renewed cookies — nobody would see.
  */
-export default defineNuxtPlugin(async () => {
+export default defineNuxtPlugin(() => {
+  const event = useRequestEvent()
   const session = useSessionStore()
 
-  const user = await $fetch('/api/auth/me', {
-    headers: useRequestHeaders(['cookie']),
-  }).catch(() => null)
-
-  session.set(user)
+  session.set((event?.context.session ?? null) as SessionUser | null)
 })

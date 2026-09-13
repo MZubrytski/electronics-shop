@@ -9,15 +9,25 @@ export type Role = z.infer<typeof Role>
  */
 const password = z.string().min(8).max(128)
 
+/**
+ * Lower-cased on the way in. The unique index is case-sensitive, so without
+ * this `Ada@example.test` and `ada@example.test` become two accounts for one
+ * mailbox — and signing in with the wrong capitalisation just fails.
+ */
+const email = z
+  .email()
+  .max(255)
+  .transform((value) => value.toLowerCase())
+
 export const SignUpInput = z.object({
-  email: z.email().max(255),
+  email,
   password,
   name: z.string().trim().min(1).max(100),
 })
 export type SignUpInput = z.infer<typeof SignUpInput>
 
 export const SignInInput = z.object({
-  email: z.email().max(255),
+  email,
   password,
 })
 export type SignInInput = z.infer<typeof SignInInput>
