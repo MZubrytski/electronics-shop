@@ -16,6 +16,7 @@
 | [docs/SETUP.md](docs/SETUP.md)                           | Как проект был собран с нуля                         |
 | [docs/DEPLOY.md](docs/DEPLOY.md)                         | Neon + Render + Vercel                               |
 | [docs/F0-EXPLAINED.md](docs/F0-EXPLAINED.md)             | Разбор нулевого этапа                                |
+| [docs/F1-EXPLAINED.md](docs/F1-EXPLAINED.md)             | Разбор F1 по файлам + как проверять руками           |
 | [docs/SESSIONS-EXPLAINED.md](docs/SESSIONS-EXPLAINED.md) | Куки и сессии простым языком, со схемами             |
 
 ### Три файла — три вопроса, и смешивать их нельзя
