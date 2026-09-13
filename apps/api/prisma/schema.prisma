@@ -1,7 +1,5 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
+// Schema grows feature by feature: each stage adds only the entities it needs.
+// Decisions behind this slice live in docs/features/F1-auth.md.
 
 generator client {
   provider = "prisma-client"
@@ -12,7 +10,52 @@ datasource db {
   provider = "postgresql"
 }
 
-model Ping {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
+enum Role {
+  user
+  admin
+  super_admin
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         Role     @default(user)
+  createdAt    DateTime @default(now())
+
+  refreshTokens RefreshToken[]
+}
+
+/// One row per issued refresh token.
+///
+/// A family is everything grown out of a single sign-in: rotation keeps the
+/// familyId, a new sign-in starts a new one. Presenting an already rotated
+/// token means someone replayed it, and only that family is revoked — other
+/// devices keep working.
+model RefreshToken {
+  id     String @id @default(cuid())
+  userId String
+
+  familyId String
+
+  /// Keyed hash of the token, never the token itself. Deterministic on
+  /// purpose: it is the lookup key.
+  tokenHash String @unique
+
+  /// This token's own expiry, refreshed on every rotation.
+  expiresAt DateTime
+
+  /// Ceiling for the whole family, copied from the previous token and never
+  /// pushed forward. Without it a session that is refreshed regularly would
+  /// never end.
+  familyExpiresAt DateTime
+
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([familyId])
 }

@@ -1,0 +1,64 @@
+import { INestApplication } from '@nestjs/common';
+import { Test } from '@nestjs/testing';
+import request from 'supertest';
+import { App } from 'supertest/types';
+import { AppModule } from '../../src/app.module.js';
+import { RateLimitService } from '../../src/auth/rate-limit.guard.js';
+import { PrismaService } from '../../src/prisma/prisma.service.js';
+
+export interface TestContext {
+  app: INestApplication<App>;
+  prisma: PrismaService;
+  rateLimits: RateLimitService;
+  http: () => request.Agent;
+}
+
+export async function createTestApp(): Promise<TestContext> {
+  const moduleRef = await Test.createTestingModule({
+    imports: [AppModule],
+  }).compile();
+
+  const app = moduleRef.createNestApplication<INestApplication<App>>();
+  await app.init();
+
+  const prisma = app.get(PrismaService);
+  const rateLimits = app.get(RateLimitService);
+
+  return {
+    app,
+    prisma,
+    rateLimits,
+    http: () => request(app.getHttpServer()),
+  };
+}
+
+/**
+ * Wipes every table between tests.
+ *
+ * Truncating beats deleting row by row: no need to know the right order, and
+ * foreign keys are handled by CASCADE. `_prisma_migrations` is left alone —
+ * dropping it would make the next run re-apply everything.
+ */
+export async function resetDatabase(prisma: PrismaService): Promise<void> {
+  const tables = await prisma.$queryRaw<{ tablename: string }[]>`
+    SELECT tablename FROM pg_tables
+    WHERE schemaname = 'public' AND tablename <> '_prisma_migrations'
+  `;
+
+  if (tables.length === 0) return;
+
+  const list = tables.map((t) => `"public"."${t.tablename}"`).join(', ');
+  await prisma.$executeRawUnsafe(
+    `TRUNCATE TABLE ${list} RESTART IDENTITY CASCADE`,
+  );
+}
+
+/**
+ * Puts the app back to a known state: empty tables and a full rate-limit
+ * budget. Both leak between tests otherwise — the database through rows, the
+ * limiter through process memory.
+ */
+export async function resetState(ctx: TestContext): Promise<void> {
+  await resetDatabase(ctx.prisma);
+  ctx.rateLimits.reset();
+}

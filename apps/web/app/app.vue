@@ -1,5 +1,7 @@
 <template>
   <UApp>
-    <UButton label="It works" icon="i-lucide-check" />
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
   </UApp>
 </template>
