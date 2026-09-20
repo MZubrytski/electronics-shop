@@ -20,6 +20,6 @@ import { TokensService } from './tokens.service.js';
     RateLimitGuard,
     RateLimitService,
   ],
-  exports: [JwtAuthGuard, TokensService, RateLimitService],
+  exports: [JwtAuthGuard, TokensService, RateLimitService, UsersModule],
 })
 export class AuthModule {}
