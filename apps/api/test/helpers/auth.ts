@@ -5,13 +5,11 @@ export const TEST_PASSWORD = 'demo1234';
 
 let counter = 0;
 
-/** Unique address per call: tests share a database within a file. */
 export function uniqueEmail(prefix = 'user'): string {
   counter += 1;
   return `${prefix}-${Date.now()}-${counter}@example.test`;
 }
 
-/** Registers someone and hands back the tokens the API issued. */
 export async function signUp(
   ctx: TestContext,
   overrides: Partial<{ email: string; password: string; name: string }> = {},
@@ -29,7 +27,6 @@ export async function signUp(
   return response.body as AuthResult;
 }
 
-/** Promotes someone straight in the database: no endpoint for this until F10. */
 export async function setRole(
   ctx: TestContext,
   userId: string,

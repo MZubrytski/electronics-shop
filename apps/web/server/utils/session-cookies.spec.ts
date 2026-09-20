@@ -4,10 +4,6 @@ import { Socket } from 'node:net'
 import { describe, expect, it } from 'vitest'
 import { clearSessionCookies, setSessionCookies } from './session-cookies'
 
-/**
- * A real h3 event over real Node request/response objects: hand-rolled fakes
- * miss methods the cookie helpers call and fail for the wrong reason.
- */
 function fakeEvent() {
   const req = new IncomingMessage(new Socket())
   const res = new ServerResponse(req)
@@ -32,8 +28,6 @@ describe('session cookies', () => {
       refreshToken: 'refresh-value',
     })
 
-    // HttpOnly is the whole reason tokens live in cookies rather than in
-    // localStorage: a stray script on the page must not be able to read them.
     expect(cookie(res, 'access')).toMatch(/HttpOnly/i)
     expect(cookie(res, 'refresh')).toMatch(/HttpOnly/i)
   })
@@ -46,8 +40,6 @@ describe('session cookies', () => {
       refreshToken: 'refresh-value',
     })
 
-    // Narrowing the refresh cookie's path looks tidy and breaks renewal during
-    // server rendering: the browser would not send it with a request for '/'.
     expect(cookie(res, 'refresh')).toMatch(/Path=\/(;|$)/i)
     expect(cookie(res, 'access')).toMatch(/Path=\/(;|$)/i)
   })
@@ -60,8 +52,6 @@ describe('session cookies', () => {
       refreshToken: 'refresh-value',
     })
 
-    // Lax, not Strict: Strict would show the shop signed out to anyone
-    // arriving from a link in a message.
     expect(cookie(res, 'access')).toMatch(/SameSite=Lax/i)
   })
 

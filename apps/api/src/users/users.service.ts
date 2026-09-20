@@ -3,10 +3,6 @@ import type { SessionUser } from '@shop/contracts';
 import type { User } from '../generated/prisma/client.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 
-/**
- * The database row and the API answer are different things: passwordHash
- * exists in the first and must never appear in the second.
- */
 export function toSessionUser(user: User): SessionUser {
   return {
     id: user.id,

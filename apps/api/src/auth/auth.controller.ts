@@ -20,10 +20,6 @@ import { AuthService } from './auth.service.js';
 import { JwtAuthGuard } from './jwt-auth.guard.js';
 import { RateLimitGuard } from './rate-limit.guard.js';
 
-/**
- * Tokens go out in the body, not in cookies: the storefront turns them into
- * cookies because it owns the origin the browser talks to.
- */
 @Controller('auth')
 export class AuthController {
   constructor(private readonly auth: AuthService) {}

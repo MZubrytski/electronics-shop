@@ -99,8 +99,6 @@ describe('Auth (e2e)', () => {
     });
 
     it('answers an unknown address the same way as a wrong password', async () => {
-      // Different answers would turn sign-in into a way to enumerate
-      // registered customers.
       await ctx
         .http()
         .post('/auth/sign-in')
@@ -136,8 +134,6 @@ describe('Auth (e2e)', () => {
     });
 
     it('reflects a role change immediately, not in fifteen minutes', async () => {
-      // The token carries only the subject; the role is read per request, so
-      // a demotion does not wait for the token to expire.
       const { tokens, user } = await signUp(ctx);
       await setRole(ctx, user.id, 'admin');
 
@@ -200,14 +196,12 @@ describe('Auth (e2e)', () => {
         .expect(200);
       const fresh = AuthResult.parse(rotated.body).tokens;
 
-      // Replaying the spent token: only a thief does this.
       await ctx
         .http()
         .post('/auth/refresh')
         .send({ refreshToken: tokens.refreshToken })
         .expect(401);
 
-      // The token that was legitimate a moment ago dies with the family.
       await ctx
         .http()
         .post('/auth/refresh')
@@ -216,10 +210,6 @@ describe('Auth (e2e)', () => {
     });
 
     it('spends a token once even when two requests arrive together', async () => {
-      // A thief racing the owner: both present the same token at the same
-      // moment. Reading the row and then updating it by id is not enough —
-      // at Read Committed both reads see revokedAt = null and both rotate,
-      // which means the replay goes completely unnoticed.
       const { tokens } = await signUp(ctx);
 
       const results = await Promise.all([
@@ -259,7 +249,6 @@ describe('Auth (e2e)', () => {
         .send({ refreshToken: first.tokens.refreshToken })
         .expect(401);
 
-      // The other device is untouched.
       await ctx
         .http()
         .post('/auth/refresh')
@@ -268,13 +257,6 @@ describe('Auth (e2e)', () => {
     });
 
     it('hands out one token when the same one is refreshed twice at once', async () => {
-      // Two requests with one token: exactly one may win.
-      //
-      // Honest limitation: this does not force the interleaving where both
-      // transactions read before either writes — in practice the second one
-      // sees the first already committed. The conditional revoke in
-      // AuthService guards that window; proving it would need two
-      // transactions held open against a barrier, which HTTP cannot express.
       const { tokens } = await signUp(ctx);
 
       const results = await Promise.all([
@@ -293,8 +275,6 @@ describe('Auth (e2e)', () => {
     });
 
     it('stops refreshing once the family hits its ceiling', async () => {
-      // Rotation must not push the ceiling forward, or a session refreshed
-      // every week would never end.
       const { tokens, user } = await signUp(ctx);
 
       await ctx.prisma.refreshToken.updateMany({
@@ -352,9 +332,6 @@ describe('Auth (e2e)', () => {
 
   describe('rate limiting', () => {
     it('cannot be dodged by changing the case of the path', async () => {
-      // Express matches routes case-insensitively and tolerates a trailing
-      // slash, so a budget keyed by the requested path hands out a fresh ten
-      // attempts for every spelling.
       const email = uniqueEmail();
       await signUp(ctx, { email });
 

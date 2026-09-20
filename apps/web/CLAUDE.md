@@ -101,6 +101,10 @@ Nuxt связывает их с `runtimeConfig` по имени автомати
 | ------------------------------ | ------------------------------------- | -------------- |
 | `NUXT_API_URL`                 | `runtimeConfig.apiUrl`                | нет            |
 | `NUXT_INTERNAL_REQUEST_SECRET` | `runtimeConfig.internalRequestSecret` | нет            |
+
+Значение `NUXT_INTERNAL_REQUEST_SECRET` должно совпадать с `INTERNAL_REQUEST_SECRET`
+в `apps/api`: по нему API доверяет адресу посетителя, который витрина шлёт
+в `x-client-address`. Разошлись — лимит на вход считается один на весь магазин.
 | `NUXT_PUBLIC_SITE_URL` | `runtimeConfig.public.siteUrl` | да |
 
 Всё, что попадает в `public`, уезжает в браузер. Секретам там не место.

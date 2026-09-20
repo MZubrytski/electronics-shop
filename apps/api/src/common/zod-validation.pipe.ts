@@ -5,12 +5,6 @@ import {
 } from '@nestjs/common';
 import type { ZodType } from 'zod';
 
-/**
- * Validates a request body against a schema from @shop/contracts.
- *
- * Deliberately tiny: the contracts package already owns the shapes, so all
- * that is missing is turning a parse failure into a 400 with field paths.
- */
 export class ZodValidationPipe<T> implements PipeTransform<unknown, T> {
   constructor(private readonly schema: ZodType<T>) {}
 

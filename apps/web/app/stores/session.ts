@@ -1,12 +1,6 @@
 import type { SessionUser } from '@shop/contracts'
 import { defineStore } from 'pinia'
 
-/**
- * Who is signed in, as far as the browser is concerned.
- *
- * Holds no tokens: those live in httpOnly cookies the browser cannot read,
- * and every call that needs them goes through this app's own server routes.
- */
 export const useSessionStore = defineStore('session', () => {
   const user = ref<SessionUser | null>(null)
 

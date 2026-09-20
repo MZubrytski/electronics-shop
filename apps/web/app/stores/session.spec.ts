@@ -42,8 +42,6 @@ describe('session store', () => {
   })
 
   it('clears the person on sign-out', async () => {
-    // Calls signOut, not clear: a test that calls clear() would still pass
-    // with the clearing removed from signOut, which is the bug worth catching.
     const session = useSessionStore()
     session.set(person)
     await session.signOut()

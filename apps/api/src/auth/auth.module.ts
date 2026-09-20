@@ -9,8 +9,6 @@ import { RateLimitGuard, RateLimitService } from './rate-limit.guard.js';
 import { TokensService } from './tokens.service.js';
 
 @Module({
-  // Secrets are passed per call in TokensService: access and refresh use
-  // different ones, and registering a single secret here would hide that.
   imports: [JwtModule.register({}), UsersModule],
   controllers: [AuthController],
   providers: [

@@ -24,8 +24,6 @@ export class JwtAuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<RequestWithUser>();
 
-    // The token arrives in a header: cookies belong to the storefront, which
-    // owns the origin the browser talks to. See docs/features/F1-auth.md.
     const token = extractBearer(request.headers.authorization);
 
     if (!token) {
@@ -40,9 +38,6 @@ export class JwtAuthGuard implements CanActivate {
       throw new UnauthorizedException();
     }
 
-    // Read the person every request. Costs one indexed lookup and buys two
-    // things: a deleted account stops working immediately, and the role can
-    // never be stale.
     const user = await this.users.findById(userId);
 
     if (!user) {

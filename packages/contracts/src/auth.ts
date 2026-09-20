@@ -3,17 +3,8 @@ import { z } from 'zod'
 export const Role = z.enum(['user', 'admin', 'super_admin'])
 export type Role = z.infer<typeof Role>
 
-/**
- * Minimum length only. Composition rules ("one digit, one capital") push people
- * towards `Password1!` and buy nothing — length is what actually helps.
- */
 const password = z.string().min(8).max(128)
 
-/**
- * Lower-cased on the way in. The unique index is case-sensitive, so without
- * this `Ada@example.test` and `ada@example.test` become two accounts for one
- * mailbox — and signing in with the wrong capitalisation just fails.
- */
 const email = z
   .email()
   .max(255)
@@ -32,7 +23,6 @@ export const SignInInput = z.object({
 })
 export type SignInInput = z.infer<typeof SignInInput>
 
-/** What the storefront is allowed to know about the signed-in person. */
 export const SessionUser = z.object({
   id: z.string(),
   email: z.email(),
@@ -41,11 +31,6 @@ export const SessionUser = z.object({
 })
 export type SessionUser = z.infer<typeof SessionUser>
 
-/**
- * The API hands tokens back in the body; the storefront turns them into
- * cookies, because it owns the origin the browser talks to.
- * See docs/features/F1-auth.md, section 3.5.
- */
 export const AuthTokens = z.object({
   accessToken: z.string(),
   refreshToken: z.string(),

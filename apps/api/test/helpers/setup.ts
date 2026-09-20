@@ -1,10 +1,5 @@
 import 'dotenv/config';
 
-/**
- * Every test run talks to DATABASE_URL_TEST, never to the working database:
- * the cleanup below truncates tables, and pointing that at real data once
- * would be enough to regret it.
- */
 const testUrl = process.env.DATABASE_URL_TEST;
 
 if (!testUrl) {

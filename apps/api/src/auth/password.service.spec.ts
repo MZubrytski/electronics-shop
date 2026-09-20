@@ -41,8 +41,6 @@ describe('PasswordService', () => {
   });
 
   it('keeps a real digest as the dummy, so an unknown address costs the same', async () => {
-    // A made-up string here would fail to parse instantly and leak which
-    // addresses are registered through response time alone.
     expect(passwords.dummyHash.startsWith('$argon2id$')).toBe(true);
     expect(await passwords.verify(passwords.dummyHash, 'anything')).toBe(false);
   });

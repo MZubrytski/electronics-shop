@@ -1,10 +1,5 @@
 import { z } from 'zod';
 
-/**
- * Checked once at startup, so a deployment missing a secret fails to boot
- * instead of booting green and throwing a 500 at the first person who tries
- * to sign in.
- */
 export const Env = z.object({
   DATABASE_URL: z.string().min(1),
   JWT_ACCESS_SECRET: z.string().min(32),

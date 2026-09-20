@@ -8,9 +8,6 @@ export class PrismaService
   implements OnModuleInit, OnModuleDestroy
 {
   constructor() {
-    // Prisma 7 talks to Postgres through a driver adapter; the connection
-    // string is read at runtime, which is what lets the e2e suite point the
-    // whole app at the test database.
     super({
       adapter: new PrismaPg({
         connectionString: process.env.DATABASE_URL,

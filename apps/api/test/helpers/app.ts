@@ -32,13 +32,6 @@ export async function createTestApp(): Promise<TestContext> {
   };
 }
 
-/**
- * Wipes every table between tests.
- *
- * Truncating beats deleting row by row: no need to know the right order, and
- * foreign keys are handled by CASCADE. `_prisma_migrations` is left alone —
- * dropping it would make the next run re-apply everything.
- */
 export async function resetDatabase(prisma: PrismaService): Promise<void> {
   const tables = await prisma.$queryRaw<{ tablename: string }[]>`
     SELECT tablename FROM pg_tables
@@ -53,11 +46,6 @@ export async function resetDatabase(prisma: PrismaService): Promise<void> {
   );
 }
 
-/**
- * Puts the app back to a known state: empty tables and a full rate-limit
- * budget. Both leak between tests otherwise — the database through rows, the
- * limiter through process memory.
- */
 export async function resetState(ctx: TestContext): Promise<void> {
   await resetDatabase(ctx.prisma);
   ctx.rateLimits.reset();

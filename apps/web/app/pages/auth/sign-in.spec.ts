@@ -16,8 +16,6 @@ describe('sign-in page', () => {
   it('stays quiet until a field has been touched', async () => {
     await render()
 
-    // Greeting someone with red text before they typed anything is rude and
-    // tells them nothing.
     expect(screen.queryByText(/invalid/i)).toBeNull()
   })
 

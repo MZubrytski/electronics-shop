@@ -40,9 +40,6 @@ export class AuthService {
 
       return await this.startSession(user.id, toSessionUser(user));
     } catch (error) {
-      // Let the unique index decide instead of checking first: a check
-      // followed by a create loses the race between two simultaneous
-      // sign-ups and turns the loser into a 500.
       if (isUniqueViolation(error)) {
         throw new ConflictException('This email is already registered');
       }
@@ -53,10 +50,6 @@ export class AuthService {
   async signIn(input: SignInInput): Promise<AuthResult> {
     const user = await this.users.findByEmail(input.email);
 
-    // Same answer for an unknown address and a wrong password — and the same
-    // amount of work. Skipping the hash when the address is unknown would
-    // answer in a millisecond instead of ~50, and the difference alone tells
-    // an attacker who is registered.
     const ok = await this.passwords.verify(
       user?.passwordHash ?? this.passwords.dummyHash,
       input.password,
@@ -69,12 +62,6 @@ export class AuthService {
     return this.startSession(user.id, toSessionUser(user));
   }
 
-  /**
-   * Rotation, plus the trap for a stolen token.
-   *
-   * Everything happens in one transaction: without it two simultaneous
-   * requests could both spend the same token and both be handed a new one.
-   */
   async refresh(presented: string): Promise<AuthResult> {
     const tokenHash = this.tokens.hashRefreshToken(presented);
 
@@ -83,8 +70,6 @@ export class AuthService {
 
       if (!stored) return null;
 
-      // A spent token coming back means someone replayed it. Only this family
-      // dies — other devices keep their sessions.
       if (stored.revokedAt) {
         await tx.refreshToken.updateMany({
           where: { familyId: stored.familyId, revokedAt: null },
@@ -96,18 +81,14 @@ export class AuthService {
       const now = new Date();
       if (stored.expiresAt <= now || stored.familyExpiresAt <= now) return null;
 
-      // Conditional update, not a plain one: under READ COMMITTED two
-      // concurrent refreshes both read revokedAt = null, and an unconditional
-      // update would hand out two live tokens for the same family — exactly
-      // the replay the check above is supposed to catch.
+      // updateMany, not update: the row count is how a second concurrent
+      // spend of the same token is caught.
       const spent = await tx.refreshToken.updateMany({
         where: { id: stored.id, revokedAt: null },
         data: { revokedAt: now },
       });
 
       if (spent.count === 0) {
-        // Someone else spent it between our read and our write: same meaning
-        // as a replay.
         await tx.refreshToken.updateMany({
           where: { familyId: stored.familyId, revokedAt: null },
           data: { revokedAt: now },
@@ -120,8 +101,6 @@ export class AuthService {
       await tx.refreshToken.create({
         data: {
           userId: stored.userId,
-          // Inherited, never pushed forward: otherwise a session refreshed
-          // every week would never end.
           familyId: stored.familyId,
           familyExpiresAt: stored.familyExpiresAt,
           tokenHash: this.tokens.hashRefreshToken(token),
@@ -151,7 +130,6 @@ export class AuthService {
     };
   }
 
-  /** Ends this session. Other devices are untouched. */
   async signOut(presented: string): Promise<void> {
     const stored = await this.prisma.refreshToken.findUnique({
       where: { tokenHash: this.tokens.hashRefreshToken(presented) },
@@ -191,7 +169,6 @@ export class AuthService {
     };
   }
 
-  /** A token never outlives its family. */
   private tokenExpiry(familyExpiresAt: Date): Date {
     const own = new Date(Date.now() + REFRESH_TOKEN_TTL_MS);
     return own < familyExpiresAt ? own : familyExpiresAt;
