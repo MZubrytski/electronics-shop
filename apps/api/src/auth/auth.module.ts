@@ -5,7 +5,8 @@ import { AuthController } from './auth.controller.js';
 import { AuthService } from './auth.service.js';
 import { JwtAuthGuard } from './jwt-auth.guard.js';
 import { PasswordService } from './password.service.js';
-import { RateLimitGuard, RateLimitService } from './rate-limit.guard.js';
+import { RateLimitGuard } from './rate-limit.guard.js';
+import { RateLimitService } from './rate-limit.service.js';
 import { TokensService } from './tokens.service.js';
 
 @Module({

@@ -1,16 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import type { SessionUser } from '@shop/contracts';
 import type { User } from '../generated/prisma/client.js';
 import { PrismaService } from '../prisma/prisma.service.js';
-
-export function toSessionUser(user: User): SessionUser {
-  return {
-    id: user.id,
-    email: user.email,
-    name: user.name,
-    role: user.role,
-  };
-}
 
 @Injectable()
 export class UsersService {

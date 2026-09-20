@@ -6,7 +6,8 @@ import {
 import type { AuthResult, SignInInput, SignUpInput } from '@shop/contracts';
 import { randomUUID } from 'node:crypto';
 import { PrismaService } from '../prisma/prisma.service.js';
-import { UsersService, toSessionUser } from '../users/users.service.js';
+import { UsersService } from '../users/users.service.js';
+import { toSessionUser } from '../users/users.mapper.js';
 import { PasswordService } from './password.service.js';
 import { REFRESH_TOKEN_TTL_MS, TokensService } from './tokens.service.js';
 

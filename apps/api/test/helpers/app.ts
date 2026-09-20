@@ -3,7 +3,7 @@ import { Test } from '@nestjs/testing';
 import request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from '../../src/app.module.js';
-import { RateLimitService } from '../../src/auth/rate-limit.guard.js';
+import { RateLimitService } from '../../src/auth/rate-limit.service.js';
 import { PrismaService } from '../../src/prisma/prisma.service.js';
 
 export interface TestContext {

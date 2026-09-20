@@ -5,7 +5,8 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import type { RequestWithUser } from '../common/current-user.decorator.js';
-import { UsersService, toSessionUser } from '../users/users.service.js';
+import { UsersService } from '../users/users.service.js';
+import { toSessionUser } from '../users/users.mapper.js';
 import { TokensService } from './tokens.service.js';
 
 function extractBearer(header: string | undefined): string | null {

@@ -5,32 +5,16 @@ import {
   HttpStatus,
   Injectable,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import type { Request } from 'express';
-import { RateLimiterMemory } from 'rate-limiter-flexible';
-
-const LIMIT = { points: 10, duration: 60 } as const;
-
-@Injectable()
-export class RateLimitService {
-  private limiter = new RateLimiterMemory(LIMIT);
-
-  async consume(key: string): Promise<boolean> {
-    try {
-      await this.limiter.consume(key);
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
-  reset(): void {
-    this.limiter = new RateLimiterMemory(LIMIT);
-  }
-}
+import { RateLimitService } from './rate-limit.service.js';
 
 @Injectable()
 export class RateLimitGuard implements CanActivate {
-  constructor(private readonly limits: RateLimitService) {}
+  constructor(
+    private readonly limits: RateLimitService,
+    private readonly config: ConfigService,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
@@ -51,7 +35,7 @@ export class RateLimitGuard implements CanActivate {
 
   private clientAddress(request: Request): string {
     const forwarded = request.header('x-client-address');
-    const secret = process.env.INTERNAL_REQUEST_SECRET;
+    const secret = this.config.get<string>('INTERNAL_REQUEST_SECRET');
 
     if (forwarded && secret && request.header('x-internal-secret') === secret) {
       return forwarded;
