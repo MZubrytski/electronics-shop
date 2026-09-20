@@ -1,6 +1,10 @@
 <script setup lang="ts">
+import { can } from '@shop/contracts'
+
 const session = useSessionStore()
 const router = useRouter()
+
+const showsAdmin = computed(() => !!session.user && can(session.user.role, 'dashboard:read'))
 
 async function onSignOut() {
   await session.signOut()
@@ -15,7 +19,10 @@ async function onSignOut() {
 
       <nav class="flex items-center gap-3">
         <template v-if="session.isSignedIn">
-          <span class="text-sm text-muted">{{ session.user?.name }}</span>
+          <UButton v-if="showsAdmin" to="/admin" variant="ghost" color="neutral">Admin</UButton>
+          <UButton to="/account/profile" variant="ghost" color="neutral">
+            {{ session.user?.name }}
+          </UButton>
           <UButton variant="ghost" color="neutral" @click="onSignOut">Sign out</UButton>
         </template>
         <template v-else>

@@ -7,6 +7,10 @@ const route = useRoute()
 const router = useRouter()
 const toast = useToast()
 
+function safeRedirect(value: unknown): string {
+  return typeof value === 'string' && value.startsWith('/') && !value.startsWith('//') ? value : '/'
+}
+
 const state = reactive({ email: '', password: '' })
 const pending = ref(false)
 
@@ -14,7 +18,7 @@ async function onSubmit(event: FormSubmitEvent<SignInInput>) {
   pending.value = true
   try {
     await session.signIn(event.data)
-    await router.push((route.query.redirect as string) || '/')
+    await router.push(safeRedirect(route.query.redirect))
   } catch {
     toast.add({ title: 'Invalid email or password', color: 'error' })
   } finally {

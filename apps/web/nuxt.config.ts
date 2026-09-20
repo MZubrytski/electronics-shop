@@ -16,5 +16,7 @@ export default defineNuxtConfig({
   },
   routeRules: {
     '/admin/**': { ssr: false },
+    '/account/**': { ssr: false },
+    '/checkout/**': { ssr: false },
   },
 })
