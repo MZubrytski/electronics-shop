@@ -28,7 +28,6 @@ describe('Health (e2e)', () => {
   it('answers with a body matching the HealthResponse contract', async () => {
     const response = await request(app.getHttpServer()).get('/health');
 
-    // Throws a readable ZodError when the response drifts from the contract.
     const body = HealthResponse.parse(response.body);
 
     expect(body.status).toBe('ok');

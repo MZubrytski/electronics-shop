@@ -24,7 +24,9 @@
     "db:seed": "npm run prisma:seed -w @shop/api",
     "db:studio": "npm run prisma:studio -w @shop/api",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "test:e2e": "npm run test:e2e -w @shop/api",
+    "db:test:setup": "npm run db:test:setup -w @shop/api"
   },
   "devDependencies": {
     "concurrently": "^10.0.5",

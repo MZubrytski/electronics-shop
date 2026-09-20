@@ -1,0 +1,6 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nuxtjs",
+  "installCommand": "npm ci --prefix ../..",
+  "buildCommand": "cd ../.. && npm run build -w @shop/contracts && npm run build -w @shop/web"
+}

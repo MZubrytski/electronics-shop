@@ -11,6 +11,9 @@ generated/
 .env.*
 !.env.example
 
+# Снимки и логи от проверок UI через Playwright MCP
+.playwright-mcp/
+
 coverage/
 *.log
 .DS_Store
