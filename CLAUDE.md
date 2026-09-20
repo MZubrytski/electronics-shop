@@ -270,7 +270,7 @@ npm run format         # prettier по всему репозиторию
 
 npm run db:migrate     # prisma migrate dev
 npm run db:test:setup  # создать базу для сквозных тестов и накатить миграции
-npm run db:seed
+npm run db:seed        # три демо-аккаунта из PRD §8, пароль demo1234
 npm run db:studio
 ```
 

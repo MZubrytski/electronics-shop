@@ -4,7 +4,7 @@ import { hash, verify } from '@node-rs/argon2';
 
 const ARGON2ID = 2;
 
-const OPTIONS = {
+export const PASSWORD_HASH_OPTIONS = {
   algorithm: ARGON2ID,
   memoryCost: 19456,
   timeCost: 2,
@@ -24,12 +24,12 @@ export class PasswordService implements OnModuleInit {
   }
 
   hash(plain: string): Promise<string> {
-    return hash(plain, OPTIONS);
+    return hash(plain, PASSWORD_HASH_OPTIONS);
   }
 
   async verify(hashed: string, plain: string): Promise<boolean> {
     try {
-      return await verify(hashed, plain, OPTIONS);
+      return await verify(hashed, plain, PASSWORD_HASH_OPTIONS);
     } catch {
       return false;
     }

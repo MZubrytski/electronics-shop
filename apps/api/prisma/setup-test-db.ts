@@ -1,10 +1,3 @@
-/**
- * Prepares the end-to-end test database.
- *
- * Creates it if missing, then brings migrations up to date. Runs before every
- * e2e suite so a fresh checkout needs no manual psql, and so a newly added
- * migration cannot be forgotten.
- */
 import 'dotenv/config';
 import { execFileSync } from 'node:child_process';
 import { Client } from 'pg';
@@ -21,8 +14,6 @@ if (!testUrl) {
 const url = new URL(testUrl);
 const databaseName = url.pathname.slice(1);
 
-// Connect to the maintenance database: you cannot create a database while
-// connected to it.
 const adminUrl = new URL(testUrl);
 adminUrl.pathname = '/postgres';
 
@@ -35,7 +26,6 @@ const existing = await admin.query(
 );
 
 if (existing.rowCount === 0) {
-  // Identifier cannot be parameterised, hence the quoting by hand.
   await admin.query(`CREATE DATABASE "${databaseName.replace(/"/g, '""')}"`);
   console.log(`Created database ${databaseName}`);
 }

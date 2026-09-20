@@ -61,7 +61,7 @@ npm run dev:api                       # nest start --watch
 npm run test -w @shop/api             # vitest run
 npm run lint -w @shop/api             # oxlint
 npm run db:migrate                    # prisma migrate dev
-npm run db:seed
+npm run db:seed                       # prisma/seed.ts — демо-аккаунты
 npm run db:studio
 ```
 
