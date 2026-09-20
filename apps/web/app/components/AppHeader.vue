@@ -22,7 +22,7 @@ async function onSignOut() {
         </template>
         <template v-else>
           <UButton to="/auth/sign-in" variant="ghost" color="neutral">Sign in</UButton>
-          <UButton to="/auth/sign-up">Sign up</UButton>
+          <UButton to="/auth/sign-up" variant="outline">Sign up</UButton>
         </template>
       </nav>
     </div>

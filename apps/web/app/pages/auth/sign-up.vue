@@ -27,33 +27,57 @@ async function onSubmit(event: FormSubmitEvent<SignUpInput>) {
 </script>
 
 <template>
-  <section class="mx-auto max-w-sm space-y-6">
-    <h1 class="text-2xl font-semibold">Create an account</h1>
+  <section class="mx-auto w-full max-w-md">
+    <div class="rounded-lg border border-default bg-default p-6 sm:p-8">
+      <h1 class="text-2xl font-bold tracking-title text-highlighted">Create an account</h1>
+      <p class="mt-2 text-meta text-muted">Place orders and keep track of them.</p>
 
-    <UForm :schema="SignUpInput" :state="state" class="space-y-4" @submit="onSubmit">
-      <UFormField label="Name" name="name">
-        <UInput v-model="state.name" autocomplete="name" class="w-full" />
-      </UFormField>
+      <UForm
+        :schema="SignUpInput"
+        :state="state"
+        class="mt-6 flex flex-col gap-4"
+        @submit="onSubmit"
+      >
+        <UFormField label="Name" name="name">
+          <UInput v-model="state.name" autocomplete="name" size="lg" class="w-full" />
+        </UFormField>
 
-      <UFormField label="Email" name="email">
-        <UInput v-model="state.email" type="email" autocomplete="email" class="w-full" />
-      </UFormField>
+        <UFormField label="Email" name="email">
+          <UInput
+            v-model="state.email"
+            type="email"
+            autocomplete="email"
+            size="lg"
+            class="w-full"
+          />
+        </UFormField>
 
-      <UFormField label="Password" name="password" hint="At least 8 characters">
-        <UInput
-          v-model="state.password"
-          type="password"
-          autocomplete="new-password"
-          class="w-full"
-        />
-      </UFormField>
+        <UFormField
+          label="Password"
+          name="password"
+          help="At least 8 characters"
+          :ui="{ help: 'mt-2 text-toned' }"
+        >
+          <UInput
+            v-model="state.password"
+            type="password"
+            autocomplete="new-password"
+            size="lg"
+            class="w-full"
+          />
+        </UFormField>
 
-      <UButton type="submit" :loading="pending" block>Create account</UButton>
-    </UForm>
+        <UButton type="submit" :loading="pending" size="lg" block class="mt-2">
+          Create account
+        </UButton>
+      </UForm>
+    </div>
 
-    <p class="text-sm text-muted">
+    <p class="mt-4 text-center text-meta text-muted">
       Already registered?
-      <NuxtLink to="/auth/sign-in" class="underline">Sign in</NuxtLink>
+      <NuxtLink to="/auth/sign-in" class="font-medium text-primary hover:underline"
+        >Sign in</NuxtLink
+      >
     </p>
   </section>
 </template>

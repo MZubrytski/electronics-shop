@@ -14,7 +14,6 @@ async function onSubmit(event: FormSubmitEvent<SignInInput>) {
   pending.value = true
   try {
     await session.signIn(event.data)
-    // Back where the visitor was headed before the sign-in wall.
     await router.push((route.query.redirect as string) || '/')
   } catch {
     toast.add({ title: 'Invalid email or password', color: 'error' })
@@ -25,29 +24,46 @@ async function onSubmit(event: FormSubmitEvent<SignInInput>) {
 </script>
 
 <template>
-  <section class="mx-auto max-w-sm space-y-6">
-    <h1 class="text-2xl font-semibold">Sign in</h1>
+  <section class="mx-auto w-full max-w-md">
+    <div class="rounded-lg border border-default bg-default p-6 sm:p-8">
+      <h1 class="text-2xl font-bold tracking-title text-highlighted">Sign in</h1>
+      <p class="mt-2 text-meta text-muted">Sign in to continue.</p>
 
-    <UForm :schema="SignInInput" :state="state" class="space-y-4" @submit="onSubmit">
-      <UFormField label="Email" name="email">
-        <UInput v-model="state.email" type="email" autocomplete="email" class="w-full" />
-      </UFormField>
+      <UForm
+        :schema="SignInInput"
+        :state="state"
+        class="mt-6 flex flex-col gap-4"
+        @submit="onSubmit"
+      >
+        <UFormField label="Email" name="email">
+          <UInput
+            v-model="state.email"
+            type="email"
+            autocomplete="email"
+            size="lg"
+            class="w-full"
+          />
+        </UFormField>
 
-      <UFormField label="Password" name="password">
-        <UInput
-          v-model="state.password"
-          type="password"
-          autocomplete="current-password"
-          class="w-full"
-        />
-      </UFormField>
+        <UFormField label="Password" name="password">
+          <UInput
+            v-model="state.password"
+            type="password"
+            autocomplete="current-password"
+            size="lg"
+            class="w-full"
+          />
+        </UFormField>
 
-      <UButton type="submit" :loading="pending" block>Sign in</UButton>
-    </UForm>
+        <UButton type="submit" :loading="pending" size="lg" block class="mt-2">Sign in</UButton>
+      </UForm>
+    </div>
 
-    <p class="text-sm text-muted">
+    <p class="mt-4 text-center text-meta text-muted">
       No account yet?
-      <NuxtLink to="/auth/sign-up" class="underline">Create one</NuxtLink>
+      <NuxtLink to="/auth/sign-up" class="font-medium text-primary hover:underline">
+        Create one
+      </NuxtLink>
     </p>
   </section>
 </template>
