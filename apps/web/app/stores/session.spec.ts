@@ -13,6 +13,16 @@ registerEndpoint('/api/auth/sign-out', {
   },
 })
 
+let meCalls = 0
+
+registerEndpoint('/api/auth/me', {
+  method: 'GET',
+  handler: () => {
+    meCalls += 1
+    return null
+  },
+})
+
 const person = {
   id: 'u1',
   email: 'ada@example.test',
@@ -24,6 +34,7 @@ describe('session store', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
     calls = 0
+    meCalls = 0
   })
 
   it('starts out as a guest', () => {
@@ -39,6 +50,22 @@ describe('session store', () => {
 
     expect(session.isSignedIn).toBe(true)
     expect(session.user?.name).toBe('Ada Lovelace')
+  })
+
+  it('stays a guest when the session endpoint answers 204', async () => {
+    const session = useSessionStore()
+    await session.ensure()
+
+    expect(session.user).toBeNull()
+    expect(session.isSignedIn).toBe(false)
+  })
+
+  it('asks for the session once, however often it is called', async () => {
+    const session = useSessionStore()
+    await session.ensure()
+    await session.ensure()
+
+    expect(meCalls).toBe(1)
   })
 
   it('clears the person on sign-out', async () => {

@@ -19,7 +19,9 @@
 | [docs/F0-EXPLAINED.md](docs/F0-EXPLAINED.md)                        | Разбор нулевого этапа                                |
 | [docs/F1-EXPLAINED.md](docs/F1-EXPLAINED.md)                        | Разбор F1 по файлам + как проверять руками           |
 | [docs/F1-CODE.md](docs/F1-CODE.md)                                  | F1 построчно: код каждого файла с объяснениями       |
+| [docs/F2-CODE.md](docs/F2-CODE.md)                                  | F2 построчно: права, guard, защита маршрутов         |
 | [docs/SESSIONS-EXPLAINED.md](docs/SESSIONS-EXPLAINED.md)            | Куки и сессии простым языком, со схемами             |
+| [docs/F3-PHOTO-PROMPTS.md](docs/F3-PHOTO-PROMPTS.md)                | Товары демо-набора и промпты для их фото (F3.2)      |
 
 ### Три файла — три вопроса, и смешивать их нельзя
 

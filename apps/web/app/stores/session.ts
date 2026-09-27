@@ -3,15 +3,23 @@ import { defineStore } from 'pinia'
 
 export const useSessionStore = defineStore('session', () => {
   const user = ref<SessionUser | null>(null)
+  const loaded = ref(false)
 
   const isSignedIn = computed(() => user.value !== null)
 
-  function set(next: SessionUser | null) {
-    user.value = next
+  function set(next: SessionUser | null | undefined) {
+    user.value = next ?? null
+    loaded.value = true
+  }
+
+  async function ensure() {
+    if (loaded.value) return
+    set(await $fetch<SessionUser | null>('/api/auth/me'))
   }
 
   function clear() {
     user.value = null
+    loaded.value = true
   }
 
   async function signIn(credentials: { email: string; password: string }) {
@@ -27,5 +35,5 @@ export const useSessionStore = defineStore('session', () => {
     clear()
   }
 
-  return { user, isSignedIn, set, clear, signIn, signUp, signOut }
+  return { user, loaded, isSignedIn, set, clear, ensure, signIn, signUp, signOut }
 })

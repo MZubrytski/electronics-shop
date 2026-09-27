@@ -29,8 +29,8 @@ async function onSubmit(event: FormSubmitEvent<SignUpInput>) {
 <template>
   <section class="mx-auto w-full max-w-md">
     <div class="rounded-lg border border-default bg-default p-6 sm:p-8">
-      <h1 class="text-2xl font-bold tracking-title text-highlighted">Create an account</h1>
-      <p class="mt-2 text-meta text-muted">Place orders and keep track of them.</p>
+      <h1 class="text-2xl font-bold text-highlighted">Create an account</h1>
+      <p class="mt-2 text-sm text-muted">Place orders and keep track of them.</p>
 
       <UForm
         :schema="SignUpInput"
@@ -73,7 +73,7 @@ async function onSubmit(event: FormSubmitEvent<SignUpInput>) {
       </UForm>
     </div>
 
-    <p class="mt-4 text-center text-meta text-muted">
+    <p class="mt-4 text-center text-sm text-muted">
       Already registered?
       <NuxtLink to="/auth/sign-in" class="font-medium text-primary hover:underline"
         >Sign in</NuxtLink
