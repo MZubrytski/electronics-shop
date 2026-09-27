@@ -4,7 +4,7 @@
 
     <div class="mx-auto flex w-full max-w-6xl flex-1 gap-6 px-4 py-8">
       <aside class="w-48 shrink-0">
-        <p class="mb-3 px-3 text-label font-bold tracking-label text-muted uppercase">Admin</p>
+        <p class="mb-3 px-3 text-xs font-bold tracking-wider text-muted uppercase">Admin</p>
         <AdminNav />
       </aside>
 

@@ -30,8 +30,8 @@ async function onSubmit(event: FormSubmitEvent<SignInInput>) {
 <template>
   <section class="mx-auto w-full max-w-md">
     <div class="rounded-lg border border-default bg-default p-6 sm:p-8">
-      <h1 class="text-2xl font-bold tracking-title text-highlighted">Sign in</h1>
-      <p class="mt-2 text-meta text-muted">Sign in to continue.</p>
+      <h1 class="text-2xl font-bold text-highlighted">Sign in</h1>
+      <p class="mt-2 text-sm text-muted">Sign in to continue.</p>
 
       <UForm
         :schema="SignInInput"
@@ -63,7 +63,7 @@ async function onSubmit(event: FormSubmitEvent<SignInInput>) {
       </UForm>
     </div>
 
-    <p class="mt-4 text-center text-meta text-muted">
+    <p class="mt-4 text-center text-sm text-muted">
       No account yet?
       <NuxtLink to="/auth/sign-up" class="font-medium text-primary hover:underline">
         Create one

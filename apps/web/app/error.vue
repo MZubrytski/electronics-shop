@@ -25,11 +25,11 @@ const copy = computed(
 
 <template>
   <div class="flex min-h-screen flex-col items-center justify-center gap-3 px-4 text-center">
-    <p class="text-label font-bold tracking-label text-muted uppercase">
+    <p class="text-xs font-bold tracking-wider text-muted uppercase">
       Error {{ error.statusCode }}
     </p>
-    <h1 class="text-2xl font-bold tracking-title text-highlighted">{{ copy.title }}</h1>
-    <p class="max-w-prose text-meta text-toned">{{ copy.text }}</p>
+    <h1 class="text-2xl font-bold text-highlighted">{{ copy.title }}</h1>
+    <p class="max-w-prose text-sm text-toned">{{ copy.text }}</p>
 
     <button
       type="button"

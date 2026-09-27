@@ -4,7 +4,7 @@ definePageMeta({ layout: 'admin', middleware: 'auth', permission: 'user:manage' 
 
 <template>
   <section class="flex flex-col gap-2">
-    <h1 class="text-2xl font-bold tracking-title text-highlighted">Users</h1>
-    <p class="text-meta text-muted">The list of people and their roles arrives in a later stage.</p>
+    <h1 class="text-2xl font-bold text-highlighted">Users</h1>
+    <p class="text-sm text-muted">The list of people and their roles arrives in a later stage.</p>
   </section>
 </template>
