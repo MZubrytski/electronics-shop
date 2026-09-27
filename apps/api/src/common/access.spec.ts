@@ -13,12 +13,12 @@ const PRD_SECTION_2: Array<{
   roles: Role[];
 }> = [
   {
-    row: 'Перейти к оплате',
+    row: 'Proceed to checkout',
     permission: 'checkout:write',
     roles: ['user', 'admin', 'super_admin'],
   },
   {
-    row: 'История своих заказов',
+    row: 'Own order history',
     permission: 'order:read:own',
     roles: ['user', 'admin', 'super_admin'],
   },
@@ -28,52 +28,52 @@ const PRD_SECTION_2: Array<{
     roles: ['user', 'admin', 'super_admin'],
   },
   {
-    row: 'Написать отзыв',
+    row: 'Write a review',
     permission: 'review:write',
     roles: ['user', 'admin', 'super_admin'],
   },
   {
-    row: 'Изменить или удалить свой отзыв',
+    row: 'Edit or delete own review',
     permission: 'review:update:own',
     roles: ['user', 'admin', 'super_admin'],
   },
   {
-    row: 'Дашборд: выручка, топ товаров',
+    row: 'Dashboard: revenue, top products',
     permission: 'dashboard:read',
     roles: ['admin', 'super_admin'],
   },
   {
-    row: 'Список всех заказов, смена статуса',
+    row: 'All orders and status changes',
     permission: 'order:manage',
     roles: ['admin', 'super_admin'],
   },
   {
-    row: 'Остатки на складе (просмотр)',
+    row: 'Stock levels, read only',
     permission: 'inventory:read',
     roles: ['admin', 'super_admin'],
   },
   {
-    row: 'Удалить любой отзыв',
+    row: 'Delete any review',
     permission: 'review:delete:any',
     roles: ['super_admin'],
   },
   {
-    row: 'Создание, изменение, удаление товаров',
+    row: 'Create, edit and delete products',
     permission: 'product:write',
     roles: ['super_admin'],
   },
   {
-    row: 'Загрузка изображений товаров',
+    row: 'Upload product images',
     permission: 'product:image:write',
     roles: ['super_admin'],
   },
   {
-    row: 'Изменение остатка вручную',
+    row: 'Edit stock by hand',
     permission: 'inventory:write',
     roles: ['super_admin'],
   },
   {
-    row: 'Список пользователей, смена ролей',
+    row: 'List users and change roles',
     permission: 'user:manage',
     roles: ['super_admin'],
   },
